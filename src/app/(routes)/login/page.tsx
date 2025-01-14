@@ -45,10 +45,10 @@ export default function Login() {
   };
 
   return (
-    <div className="h-screen bg-indigo-100 flex justify-center items-center">
-      <div className="lg:w-2/5 md:w-1/2 w-2/3">
+    <div className="h-screen bg-slate-200 flex justify-center items-center">
+      <div className="lg:w-2/6 md:w-1/2 w-2/3">
         <form className="bg-white p-10 rounded-lg shadow-lg min-w-full" onSubmit={handleSubmit}>
-          <h1 className="text-center text-2xl mb-6 text-gray-600 font-bold font-sans">Login</h1>
+          <h1 className="text-center text-2xl mb-6 font-bold">Login</h1>
           {error && <p className="text-red-500">{error}</p>}
           {success && <p className="text-green-500">{success}</p>}
           <div>
