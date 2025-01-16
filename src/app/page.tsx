@@ -3,37 +3,39 @@ import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
 import {FiX, FiMenu } from "react-icons/fi";
+import { carBrands, carTypes, BrandProps } from './lib/data';
 
 
-function Brand(){
+
+function Brand({ name, image }: BrandProps) {
   return(
     <>
-      <div className="flex flex-col items-center justify-center bg-white border shadow-lg size-52 rounded-2xl hover:scale-110 transition duration-500">
+      <div className="flex flex-col items-center justify-center bg-white border shadow-lg size-48 rounded-2xl hover:scale-110 transition duration-500">
         <Image
-          src="/ic_mercedes.svg" // Pastikan gambar ada di folder public
-          alt="Mercedes Benz"
+          src={image}// Pastikan gambar ada di folder public
+          alt={name}
           width={200} // Sesuaikan ukuran lebar gambar
           height={200} // Sesuaikan ukuran tinggi gambar
-          className="size-28" // Opsional: Menambahkan margin bawah
+          className="size-20" // Opsional: Menambahkan margin bawah
         />
-        <h2 className="py-4">Mercedes Benz</h2>
+        <h2 className="mt-6 font-semibold">{name}</h2>
       </div>
     </>
   )
 }
 
-function CarType(){
+function CarType({ name, image }: BrandProps) {
   return(
     <>
       <div className="flex flex-col items-center justify-center bg-white border shadow-lg size-52 rounded-2xl hover:scale-110 transition duration-500">
         <Image
-          src="/body_sedan.svg" // Pastikan gambar ada di folder public
-          alt="Mercedes Benz"
-          width={200} // Sesuaikan ukuran lebar gambar
-          height={200} // Sesuaikan ukuran tinggi gambar
-          className="size-32" // Opsional: Menambahkan margin bawah
+          src={image}
+          alt={name}
+          width={200}
+          height={200}
+          className="size-32" 
         />
-        <h2>Sedan</h2>
+        <h2 className="font-semibold">{name}</h2>
       </div>
     </>
   )
@@ -86,19 +88,19 @@ export default function Home() {
       <section className="w-full min-h-[1000px]">
         <div className="lg:m-20">
             <div className="mb-20">
-              <h2 className="text-3xl mb-10 font-bold text-center">Rent by Brands</h2>
+              <h2 className="text-3xl mb-10 font-bold">Rent by Brands</h2>
               <div className="grid justify-items-center grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-5">
-                {Array.from({ length: 12 }).map((_, index) => (
-                  <Brand key={index} />
-                ))}
+              {carBrands.map((brand, index) => (
+                <Brand key={index} name={brand.name} image={brand.image} />
+              ))}
               </div>
             </div>
             <div>
-              <h2 className="text-3xl mb-10 font-bold text-center">Rent by Body Type</h2>
+              <h2 className="text-3xl mb-10 font-bold">Rent by Body Type</h2>
               <div className="grid justify-items-center grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-5">
-                {Array.from({ length: 12 }).map((_, index) => (
-                  <CarType key={index} />
-                ))}
+              {carTypes.map((carType, index) => (
+                <CarType key={index} name={carType.name} image={carType.image} />
+              ))}
               </div>
             </div>
         </div>
