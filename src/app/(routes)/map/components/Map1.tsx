@@ -3,29 +3,81 @@
 import { View } from "ol";
 import TileLayer from "ol/layer/Tile";
 import { OSM } from "ol/source";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Map as OlMap } from "ol";
-import { fromLonLat } from "ol/proj"; // Impor fungsi untuk konversi koordinat
+import { fromLonLat, toLonLat } from "ol/proj";
+import { Icon, Style } from "ol/style";
+import Feature from "ol/Feature";
+import { Point } from "ol/geom";
+import VectorLayer from "ol/layer/Vector";
+import VectorSource from "ol/source/Vector";
 
-function Map() {
+interface MapProps {
+  onPinClick: (coords: [number, number]) => void; // Menambahkan props untuk menerima fungsi
+}
+
+function Map({ onPinClick }: MapProps) {
+  const [map, setMap] = useState<OlMap | null>(null);
+  const [vectorSource, setVectorSource] = useState<VectorSource>(new VectorSource());
+  const [pinFeature, setPinFeature] = useState<Feature | null>(null);
+
   useEffect(() => {
     const osmLayer = new TileLayer({
       source: new OSM({
-        attributions: [] // Menghilangkan copyright OpenStreetMap
+        attributions: [], // Menghilangkan copyright OpenStreetMap
       }),
     });
 
-    const map = new OlMap({
+    const vectorLayer = new VectorLayer({
+      source: vectorSource,
+    });
+
+    const olMap = new OlMap({
       target: "map-container",
-      layers: [osmLayer],
+      layers: [osmLayer, vectorLayer],
       view: new View({
-        center: fromLonLat([106.8456, -6.2088]), // Koordinat Jakarta dalam lon, lat
-        zoom: 16, // Sesuaikan zoom level sesuai kebutuhan
+        center: fromLonLat([106.8456, -6.2088]), // Koordinat Jakarta
+        zoom: 15,
       }),
     });
 
-    return () => map.setTarget(null!);
-  }, []);
+    olMap.on("click", (event) => {
+      const coords: [number, number] = toLonLat(event.coordinate) as [number, number]; // Mendapatkan koordinat lon, lat
+      console.log("Koordinat yang diklik: ", coords);
+
+      // Memanggil fungsi onPinClick dari props
+      onPinClick(coords); // Kirimkan koordinat ke komponen induk
+
+      if (!pinFeature) {
+        const newPinFeature = new Feature({
+          geometry: new Point(event.coordinate),
+        });
+
+        newPinFeature.setStyle(
+          new Style({
+            image: new Icon({
+              src: "https://cdn-icons-png.flaticon.com/512/252/252025.png", // Ganti dengan URL pin merah Anda
+              scale: 0.07,
+            }),
+          })
+        );
+
+        vectorSource.addFeature(newPinFeature);
+        setPinFeature(newPinFeature);
+      } else {
+        const geometry = pinFeature.getGeometry();
+        if (geometry instanceof Point) {
+          geometry.setCoordinates(event.coordinate);
+        }
+      }
+    });
+
+    setMap(olMap);
+
+    return () => {
+      olMap.setTarget(null!); // Bersihkan peta saat komponen unmount
+    };
+  }, [pinFeature, vectorSource, onPinClick]);
 
   return <div className="w-[450px] h-[450px]" id="map-container" />;
 }
