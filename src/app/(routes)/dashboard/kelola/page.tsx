@@ -21,33 +21,33 @@ function Card(){
           <div className="flex justify-around bg-gray-200 min-h-10 rounded-2xl mt-2 p-2">
               <div className="flex flex-col items-center justify-center gap-1">
                 <Image
-                  src="/ic_smile.svg"
+                  src="/ic_door.svg"
                   alt="BMW"
                   width={500}
                   height={500}
                   className="size-4"
                 />
-                <h2 className="text-xs">4,000</h2>
+                <h2 className="text-xs">4 Doors</h2>
               </div>
               <div className="flex flex-col items-center justify-center gap-1">
                 <Image
-                  src="/ic_smile.svg"
+                  src="/ic_gear.svg"
                   alt="BMW"
                   width={500}
                   height={500}
                   className="size-4 "
                 />
-                <h2 className="text-xs">4,000</h2>
+                <h2 className="text-xs">Auto</h2>
               </div>
               <div className="flex flex-col items-center justify-center gap-1">
                 <Image
-                  src="/ic_smile.svg"
+                  src="/ic_person.svg"
                   alt="BMW"
                   width={500}
                   height={500}
                   className="size-4 "
                 />
-                <h2 className="text-xs">4,000</h2>
+                <h2 className="text-xs">4 Person</h2>
               </div>
           </div>
           <div className="flex mt-2">
