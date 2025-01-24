@@ -10,14 +10,24 @@ export default function Tambah() {
     jumlah: 0,
     lokasi: { lat: 0, lon: 0 },
     transmisi: '',
+    image: null, 
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+    const { name, value, type } = e.target;
+
+    if (type === 'file') {
+      const file = (e.target as HTMLInputElement).files?.[0] || null; // Ambil file pertama atau null
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: file,
+      }));
+    } else {
+      setFormData((prevData) => ({
+        ...prevData,
+        [name]: value,
+      }));
+    }
   };
 
   const handlePinClick = (coords: [number, number]) => {
@@ -29,15 +39,31 @@ export default function Tambah() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Debug log
     console.log('Form Data Submitted:', formData);
+
+    // Jika Anda perlu mengirimkan file ke server, gunakan FormData API
+    const data = new FormData();
+    data.append('namaKendaraan', formData.namaKendaraan);
+    data.append('tipeKendaraan', formData.tipeKendaraan);
+    data.append('harga', formData.harga.toString());
+    data.append('jumlah', formData.jumlah.toString());
+    data.append('lokasi', JSON.stringify(formData.lokasi));
+    data.append('transmisi', formData.transmisi);
+    if (formData.image) {
+      data.append('image', formData.image);
+    }
+
+    // Kirim data menggunakan fetch/axios sesuai kebutuhan
   };
 
   return (
-    <div className='p-4'>
-      <h1 className='text-3xl font-bold'>Tambah Kendaraan</h1>
+    <div className="p-4">
+      <h1 className="text-3xl font-bold">Tambah Kendaraan</h1>
       <p>Masukkan informasi lokasi dan kendaraan yang ingin ditambah.</p>
 
-      <div className='flex gap-10'>
+      <div className="flex gap-10">
         <form onSubmit={handleSubmit} className="space-y-4 w-1/2 mt-6">
           <div>
             <label htmlFor="namaKendaraan" className="block text-sm mb-2">Nama Kendaraan</label>
@@ -113,6 +139,20 @@ export default function Tambah() {
           </div>
 
           <div>
+            <label htmlFor="image" className="block text-sm mb-2">
+              Upload Gambar
+            </label>
+            <input
+              type="file"
+              id="image"
+              name="image"
+              accept="image/*"
+              onChange={handleInputChange}
+              className="w-full p-2 border border-gray-300 rounded-lg text-xs file:rounded file:border file:border-gray-200 file:cursor-pointer file:hover:bg-gray-200 file:px-2 file:py-1"
+            />
+          </div>
+
+          <div>
             <button
               type="submit"
               className="bg-blue-500 text-white px-4 py-2 rounded-xl hover:bg-blue-600"
@@ -122,10 +162,10 @@ export default function Tambah() {
           </div>
         </form>
 
-        <div className='mt-4'>
-          <h2 className='mb-2 text-sm'>Pilih Lokasi</h2>
-          <div className='border-2 rounded-2xl p-2'>
-            <Map onPinClick={handlePinClick} /> {/* Teruskan onPinClick */}
+        <div className="mt-4">
+          <h2 className="mb-2 text-sm">Pilih Lokasi</h2>
+          <div className="border-2 rounded-2xl p-2">
+            <Map onPinClick={handlePinClick} />
           </div>
         </div>
       </div>
