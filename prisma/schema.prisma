@@ -8,9 +8,28 @@ generator client {
 }
 
 model User {
-  id        Int    @id @default(autoincrement())
-  username  String @unique
-  email     String @unique
-  password  String
-  createdAt DateTime @default(now())
+  id            Int      @id @default(autoincrement())
+  username      String   @unique
+  email         String   @unique
+  password      String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @default(now()) @updatedAt
+  vehicles      Mobil[]  @relation("UserVehicles")
 }
+
+model Mobil {
+  id            Int      @id @default(autoincrement())
+  namaKendaraan String
+  tipeKendaraan String
+  harga         Int
+  jumlah        Int
+  lokasi        Json     // Menyimpan { lat: number, lon: number }
+  transmisi     String
+  image         String?  // Menyimpan URL atau path gambar kendaraan
+  rating        Float    @default(0)  // Menyimpan rating kendaraan (misalnya 0-5)
+  userId        Int
+  user          User     @relation("UserVehicles", fields: [userId], references: [id])
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
