@@ -33,6 +33,8 @@ export default function Login() {
         setSuccess('Login successful!');
         // Simpan token JWT di cookie
         Cookies.set('token', data.token, { expires: 1, path: '/' });
+        // Simpan userId di localStorage
+        localStorage.setItem('userId', data.userId);
         // Redirect ke dashboard
         router.push('/dashboard');
       } else {
