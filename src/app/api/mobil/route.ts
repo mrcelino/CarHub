@@ -1,6 +1,23 @@
 import { NextResponse } from 'next/server';
 import prisma from '../../lib/prisma'; // Sesuaikan dengan path prisma Anda
 
+// Fungsi GET untuk mendapatkan semua data mobil
+export async function GET(req: Request) {
+  try {
+    const mobilList = await prisma.mobil.findMany({
+      include: {
+        user: true, // Sertakan data user jika diperlukan
+      },
+    });
+
+    return NextResponse.json(mobilList, { status: 200 });
+  } catch (error) {
+    console.error('Terjadi kesalahan:', error);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+  }
+}
+
+// Fungsi POST untuk menyimpan data baru
 export async function POST(req: Request) {
   try {
     const formData = await req.formData();
@@ -12,7 +29,6 @@ export async function POST(req: Request) {
     const transmisi = formData.get('transmisi') as string;
     const image = formData.get('image') as File;
     const userId = parseInt(formData.get('userId') as string);
-
 
     const newMobil = await prisma.mobil.create({
       data: {
@@ -40,3 +56,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
+
+
+
+
