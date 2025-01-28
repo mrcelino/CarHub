@@ -1,88 +1,143 @@
+"use client";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
-function Card(){
-  return(
-    <>
-      <div className="border-2 hover:border-black transition duration-500 min-h-80 rounded-3xl p-2 flex flex-col max-w-72">
-        <Image
-          src="/car1.png"
-          alt="BMW"
-          width={500}
-          height={500}
-          className="mb-4"
-        />
-        <div className="px-4">
-          <h2 className="text-lg font-medium">Audi A8 L 2022</h2>
-          <div className="flex flex-row">
-              <h2 className="text-base font-semibold">78.90</h2>
-              <h2 className="text-base font-medium">/day</h2>
-          </div>
-          <div className="flex justify-around bg-gray-200 min-h-10 rounded-2xl mt-2 p-2">
-              <div className="flex flex-col items-center justify-center gap-1">
-                <Image
-                  src="/ic_door.svg"
-                  alt="BMW"
-                  width={500}
-                  height={500}
-                  className="size-4"
-                />
-                <h2 className="text-xs">4 Doors</h2>
-              </div>
-              <div className="flex flex-col items-center justify-center gap-1">
-                <Image
-                  src="/ic_gear.svg"
-                  alt="BMW"
-                  width={500}
-                  height={500}
-                  className="size-4 "
-                />
-                <h2 className="text-xs">Auto</h2>
-              </div>
-              <div className="flex flex-col items-center justify-center gap-1">
-                <Image
-                  src="/ic_person.svg"
-                  alt="BMW"
-                  width={500}
-                  height={500}
-                  className="size-4 "
-                />
-                <h2 className="text-xs">4 Person</h2>
-              </div>
-          </div>
-          <div className="flex mt-2">
-            <button className="w-1/2 border-black border p-2 rounded-2xl text-sm font-semibold mt-2 hover:bg-black hover:text-white transition duration-500">Edit</button>
-            <button className="w-1/2 bg-red-500 text-white p-2 rounded-2xl text-sm font-semibold mt-2 ml-2">Delete</button>
-          </div>
-        </div>
-
-      </div>
-    </>
-  )
+interface Car {
+  id: number;
+  image: string;
+  namaKendaraan: string;
+  harga: string;
+  jumlah: number;
+  transmisi: string;
+  userId: number;
 }
 
-export default function Kelola(){
-  return(
-    <div className="mt-4 p-4 pt-0">
-      <div className="flex justify-between">
-        <h2 className="text-2xl font-semibold">Kelola Kendaraan</h2>
-        <Link href="/dashboard/kelola/tambah"
-        className="border-2 border-black p-3 rounded-2xl text-sm font-semibold">Tambah Data</Link>
-      </div>
-      <div className="flex justify-around items-center min-h-screen mt-6">
-        <div className="grid grid-cols-4 gap-4">
-          <Card />
-          <Card />
-          <Card />
-          <Card />
-          <Card />
-          <Card />
-          <Card />
-          <Card />
+function Card({ car, onDelete }: { car: Car; onDelete: (id: number) => void }) {
+  return (
+    <div className="border-2 hover:border-black transition duration-500 max-h-[400px] rounded-3xl p-2 flex flex-col max-w-72">
+      <Image
+        src={`/${car.image}`}
+        alt={car.namaKendaraan}
+        width={500}
+        height={500}
+        className="size-96 rounded-3xl object-cover p-2"
+      />
+      <div className="px-4">
+        <h2 className="text-lg font-bold">{car.namaKendaraan}</h2>
+        <div className="flex flex-row">
+          <h2 className="text-base font-semibold">{car.harga}</h2>
+          <h2 className="text-base font-medium">/day</h2>
+        </div>
+        <div className="flex justify-around bg-gray-200 min-h-10 rounded-2xl mt-2 p-2">
+          <div className="flex flex-col items-center justify-center gap-1">
+            <Image
+              src="/ic_door.svg"
+              alt="Doors"
+              width={500}
+              height={500}
+              className="size-4"
+            />
+            <h2 className="text-xs">{car.jumlah} Doors</h2>
+          </div>
+          <div className="flex flex-col items-center justify-center gap-1">
+            <Image
+              src="/ic_gear.svg"
+              alt="Transmisi"
+              width={500}
+              height={500}
+              className="size-4"
+            />
+            <h2 className="text-xs">{car.transmisi}</h2>
+          </div>
+          <div className="flex flex-col items-center justify-center gap-1">
+            <Image
+              src="/ic_person.svg"
+              alt="Capacity"
+              width={500}
+              height={500}
+              className="size-4"
+            />
+            <h2 className="text-xs">4 Person</h2>
+          </div>
+        </div>
+        <div className="flex mt-2">
+          <button className="w-1/2 border-black border p-2 rounded-2xl text-sm font-semibold mt-2 hover:bg-black hover:text-white transition duration-500">
+            Edit
+          </button>
+          <button
+            className="w-1/2 bg-red-500 text-white p-2 rounded-2xl text-sm font-semibold mt-2 ml-2"
+            onClick={() => onDelete(car.id)}
+          >
+            Delete
+          </button>
         </div>
       </div>
-
-
     </div>
-  )
+  );
+}
+
+export default function CarList() {
+  const [cars, setCars] = useState<Car[]>([]);
+
+  useEffect(() => {
+    // Ambil userId dari localStorage
+    const userId = parseInt(localStorage.getItem("userId") || "0", 10);
+
+    // Fetch data kendaraan dari API
+    fetch("/api/mobil") // Ganti dengan URL API-mu
+      .then((response) => response.json())
+      .then((data) => {
+        // Filter data berdasarkan userId
+        const filteredCars = data.filter((car: Car) => car.userId === userId);
+        setCars(filteredCars);
+      })
+      .catch((error) => console.error("Error fetching cars:", error));
+  }, []);
+
+  const handleDelete = (id: number) => {
+    // Hapus mobil dari state
+    const updatedCars = cars.filter((car) => car.id !== id);
+    setCars(updatedCars);
+  
+    fetch(`/api/mobil/${id}`, {
+      method: "DELETE",
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to delete car");
+        }
+        console.log(`Car with id ${id} deleted successfully`);
+      })
+      .catch((error) => console.error("Error deleting car:", error));
+  };
+  
+  
+
+  return (
+    <>
+      <div className="mt-4 p-4 pt-0">
+        <div className="flex justify-between">
+          <h2 className="text-2xl font-semibold">Kelola Kendaraan</h2>
+          <Link
+            href="/dashboard/kelola/tambah"
+            className="border-2 border-black p-3 rounded-2xl text-sm font-semibold"
+          >
+            Tambah Data
+          </Link>
+        </div>
+        <div className="flex justify-around min-h-screen mt-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+            {cars.length > 0 ? (
+              cars.map((car) => (
+                <Card key={car.id} car={car} onDelete={handleDelete} />
+              ))
+            ) : (
+              <p>No cars available for this user.</p>
+            )}
+          </div>
+        </div>
+      </div>
+    </>
+  );
 }
