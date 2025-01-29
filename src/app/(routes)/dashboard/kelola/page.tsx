@@ -1,7 +1,8 @@
-"use client";
+'use client'
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import Popup from "./popup"; // Import Popup component
 
 interface Car {
   id: number;
@@ -62,9 +63,11 @@ function Card({ car, onDelete }: { car: Car; onDelete: (id: number) => void }) {
           </div>
         </div>
         <div className="flex mt-2">
-          <button className="w-1/2 border-black border p-2 rounded-2xl text-sm font-semibold mt-2 hover:bg-black hover:text-white transition duration-500">
-            Edit
-          </button>
+          <Link href={`/dashboard/kelola/edit/${car.id}`} className="w-1/2">
+            <button className="w-full border-black border p-2 rounded-2xl text-sm font-semibold mt-2 hover:bg-black hover:text-white transition duration-500">
+              Edit
+            </button>
+          </Link>
           <button
             className="w-1/2 bg-red-500 text-white p-2 rounded-2xl text-sm font-semibold mt-2 ml-2"
             onClick={() => onDelete(car.id)}
@@ -79,16 +82,15 @@ function Card({ car, onDelete }: { car: Car; onDelete: (id: number) => void }) {
 
 export default function CarList() {
   const [cars, setCars] = useState<Car[]>([]);
+  const [showPopup, setShowPopup] = useState(false);
+  const [carToDelete, setCarToDelete] = useState<number | null>(null);
 
   useEffect(() => {
-    // Ambil userId dari localStorage
     const userId = parseInt(localStorage.getItem("userId") || "0", 10);
 
-    // Fetch data kendaraan dari API
-    fetch("/api/mobil") // Ganti dengan URL API-mu
+    fetch("/api/mobil")
       .then((response) => response.json())
       .then((data) => {
-        // Filter data berdasarkan userId
         const filteredCars = data.filter((car: Car) => car.userId === userId);
         setCars(filteredCars);
       })
@@ -96,23 +98,33 @@ export default function CarList() {
   }, []);
 
   const handleDelete = (id: number) => {
-    // Hapus mobil dari state
-    const updatedCars = cars.filter((car) => car.id !== id);
-    setCars(updatedCars);
-  
-    fetch(`/api/mobil/${id}`, {
-      method: "DELETE",
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Failed to delete car");
-        }
-        console.log(`Car with id ${id} deleted successfully`);
-      })
-      .catch((error) => console.error("Error deleting car:", error));
+    setCarToDelete(id); // Set the car ID to delete
+    setShowPopup(true); // Show the popup
   };
-  
-  
+
+  const confirmDelete = () => {
+    if (carToDelete !== null) {
+      const updatedCars = cars.filter((car) => car.id !== carToDelete);
+      setCars(updatedCars);
+
+      fetch(`/api/mobil/${carToDelete}`, {
+        method: "DELETE",
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Failed to delete car");
+          }
+          console.log(`Car with id ${carToDelete} deleted successfully`);
+        })
+        .catch((error) => console.error("Error deleting car:", error));
+    }
+
+    setShowPopup(false); // Close the popup after deletion
+  };
+
+  const cancelDelete = () => {
+    setShowPopup(false); // Close the popup without deleting
+  };
 
   return (
     <>
@@ -138,6 +150,12 @@ export default function CarList() {
           </div>
         </div>
       </div>
+
+      <Popup
+        isVisible={showPopup}
+        onConfirm={confirmDelete}
+        onCancel={cancelDelete}
+      />
     </>
   );
 }
